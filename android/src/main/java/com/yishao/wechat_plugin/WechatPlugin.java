@@ -7,6 +7,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 
+import com.tencent.mm.opensdk.modelmsg.SendAuth;
+import com.tencent.mm.opensdk.openapi.IWXAPI;
+import com.tencent.mm.opensdk.openapi.WXAPIFactory;
+
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -34,6 +38,8 @@ public class WechatPlugin implements MethodCallHandler {
 
     private static Registrar sRegistrar;
     private static Result sResult;
+
+    private IWXAPI iwxapi = null;
 
     private Context context;
     private Activity activity;
@@ -118,15 +124,49 @@ public class WechatPlugin implements MethodCallHandler {
     }
 
     private void registerWechat(MethodCall call, Result result) {
-
+        final String appid = call.argument("appid");
+        iwxapi = WXAPIFactory.createWXAPI(context, appid, true);
+        if (iwxapi == null) {
+            result.success(false);
+        } else {
+            iwxapi.registerApp(appid);
+            result.success(true);
+        }
     }
 
     private void loginWechat(MethodCall call, Result result) {
+        final String scope = call.argument("scope");
+        final String state = call.argument("state");
 
+        Log.d(TAG, "loginWechat scope = "+scope+" state = "+state);
+
+        if (iwxapi == null) {
+            Log.e(TAG, "Error: iwxapi is null");
+            return;
+        }
+
+        final SendAuth.Req req = new SendAuth.Req();
+        req.scope = scope;
+        req.state = state;
+        iwxapi.sendReq(req);
     }
 
     private void loginWechatByQRCode(MethodCall call, Result result) {
+        final String appid = call.argument("appid");
+        final String url = call.argument("url");
+        final String scope = call.argument("scope");
+        final String state = call.argument("state");
 
+        Log.d(TAG, "loginWechatByQRCode appid = "appid
+                        +" url = "+url
+                        +" scope = "+scope
+                        +" state = "+state
+                        );
+
+        if (iwxapi == null) {
+            Log.e(TAG, "Error: iwxapi is null");
+            return;
+        }
     }
 
     private void shareText2Wechat(MethodCall call, Result result) {
