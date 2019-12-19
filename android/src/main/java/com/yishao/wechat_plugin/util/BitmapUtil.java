@@ -49,16 +49,6 @@ public class BitmapUtil {
         return bitmap;
     }
 
-//    public static byte[] compressBitmap(Bitmap bitmap, int sizeLimit) {
-//        if (bitmap == null) {
-//            return null;
-//        }
-//
-//        Bitmap dstBitmap = null;
-//        return dstBitmap;
-//
-//    }
-
     public static byte[] bitmap2ByteArray(final Bitmap bitmap, final boolean needRecycle) {
         if (bitmap == null) {
             return null;

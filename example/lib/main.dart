@@ -50,7 +50,17 @@ class _MyAppState extends State<MyApp> {
         body: Center(
           child: Text('Running on: $_platformVersion\n'),
         ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: _registerWechat,
+          tooltip: 'registerWechat',
+          child: Icon(Icons.local_play),
+        ),
       ),
     );
+  }
+
+  void _registerWechat() async {
+    int res = await WechatPlugin.loginWechat();
+    print("_registerWechat $res");
   }
 }
