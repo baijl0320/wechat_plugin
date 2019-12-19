@@ -136,17 +136,13 @@ class WechatPlugin {
    * scene: where to share
    * */
   static Future<int> shareImage2Wechat({
-    String webpageUrl: "",
-    String title: "",
-    String description: "",
-    String imageUrl: "",
+    String imagePath: "",
+    ByteData imageData,
     int scene: 0,
   }) async {
     final Map<String, dynamic> params = <String, dynamic>{
-      'webpageUrl': webpageUrl,
-      'title': title,
-      'description': description,
-      'imageUrl': imageUrl,
+      'imagePath': imagePath,
+      'imageData': imageData,
       'scene': scene,
     };
 
@@ -215,7 +211,7 @@ class WechatPlugin {
     String nonceStr: "",
     String timeStamp: "",
     String sign: "",
-    String package: "",
+    String packages: "",
     String appid: "",
   }) async {
     final Map<String, dynamic> params = <String, dynamic>{
@@ -224,7 +220,7 @@ class WechatPlugin {
       'nonceStr': nonceStr,
       'timeStamp': timeStamp,
       'sign': sign,
-      'package': package,
+      'packages': packages,
       'appid': appid,
     };
 

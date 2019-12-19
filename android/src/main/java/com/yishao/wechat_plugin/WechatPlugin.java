@@ -5,11 +5,16 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.tencent.mm.opensdk.modelmsg.SendAuth;
+import com.tencent.mm.opensdk.modelmsg.SendMessageToWX;
+import com.tencent.mm.opensdk.modelmsg.WXImageObject;
+import com.tencent.mm.opensdk.modelmsg.WXMediaMessage;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
+import com.yishao.wechat_plugin.util.BitmapUtil;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -43,6 +48,8 @@ public class WechatPlugin implements MethodCallHandler {
 
     private Context context;
     private Activity activity;
+
+    private final int WX_THUMBNAIL_SIZE_LIMIT = 31;
 
     private WechatPlugin(Context context, Activity activity) {
         this.context = context;
@@ -157,7 +164,7 @@ public class WechatPlugin implements MethodCallHandler {
         final String scope = call.argument("scope");
         final String state = call.argument("state");
 
-        Log.d(TAG, "loginWechatByQRCode appid = "appid
+        Log.d(TAG, "loginWechatByQRCode appid = " + appid
                         +" url = "+url
                         +" scope = "+scope
                         +" state = "+state
@@ -170,27 +177,141 @@ public class WechatPlugin implements MethodCallHandler {
     }
 
     private void shareText2Wechat(MethodCall call, Result result) {
+        final String text = call.argument("text");
+        final int scene = call.argument("scene");
 
+        Log.d(TAG, "shareText2Wechat text = " + text
+                +" scene = "+scene
+        );
+
+        if (iwxapi == null) {
+            Log.e(TAG, "Error: iwxapi is null");
+            return;
+        }
     }
 
     private void shareWebpage2Wechat(MethodCall call, Result result) {
+        final String webpageUrl = call.argument("webpageUrl");
+        final String title = call.argument("title");
+        final String description = call.argument("description");
+        final String imageUrl = call.argument("imageUrl");
+        final int scene = call.argument("scene");
 
+        Log.d(TAG, "shareWebpage2Wechat webpageUrl = " + webpageUrl
+                +" title = "+title
+                +" description = "+description
+                +" imageUrl = "+imageUrl
+                +" scene = "+scene
+        );
+
+        if (iwxapi == null) {
+            Log.e(TAG, "Error: iwxapi is null");
+            return;
+        }
     }
 
     private void shareImage2Wechat(MethodCall call, Result result) {
+        final String imagePath = call.argument("imagePath");
+        final int scene = call.argument("scene");
 
+        Log.d(TAG, "shareImage2Wechat imagePath = " + imagePath
+                +" scene = "+scene
+        );
+
+        if (iwxapi == null) {
+            Log.e(TAG, "Error: iwxapi is null");
+            return;
+        }
+
+        WXMediaMessage wxMsg = new WXMediaMessage();
+        Bitmap bitmap = BitmapUtil.gtLocalOrNetBitmap(imagePath);
+        if (bitmap != null) {
+            WXImageObject wxImageObject = new WXImageObject(bitmap);
+            wxMsg.mediaObject = wxImageObject;
+            // TODO 如果图片的thumbnail尺寸过大，需要添加压缩操作。
+            wxMsg.thumbData = BitmapUtil.bitmap2ByteArray(bitmap, false);
+
+            SendMessageToWX.Req req = new SendMessageToWX.Req();
+            req.transaction = String.valueOf(System.currentTimeMillis());
+            req.message = wxMsg;
+            req.scene = scene;
+            iwxapi.sendReq(req);
+        } else {
+            Log.e(TAG, "Error: shareImage2Wechat bitmap is null");
+            return;
+        }
     }
 
     private void shareMusic2Wechat(MethodCall call, Result result) {
+        final String imgUrl = call.argument("imgUrl");
+        final String musicUrl = call.argument("musicUrl");
+        final String title = call.argument("title");
+        final String description = call.argument("description");
+        final String musicDataUrl = call.argument("musicDataUrl");
+        final String musicLowBandUrl = call.argument("musicLowBandUrl");
+        final String musicLowBandDataUrl = call.argument("musicLowBandDataUrl");
+        final int scene = call.argument("scene");
 
+        Log.d(TAG, "shareMusic2Wechat imgUrl = " + imgUrl
+                +" musicUrl = "+musicUrl
+                +" title = "+title
+                +" description = "+description
+                +" musicDataUrl = "+musicDataUrl
+                +" musicLowBandUrl = "+musicLowBandUrl
+                +" musicLowBandDataUrl = "+musicLowBandDataUrl
+                +" scene = "+scene
+        );
+
+        if (iwxapi == null) {
+            Log.e(TAG, "Error: iwxapi is null");
+            return;
+        }
     }
 
     private void shareVideo2Wechat(MethodCall call, Result result) {
+        final String imgUrl = call.argument("imgUrl");
+        final String videoUrl = call.argument("videoUrl");
+        final String title = call.argument("title");
+        final String description = call.argument("description");
+        final String videoLowBandUrl = call.argument("videoLowBandUrl");
+        final int scene = call.argument("scene");
 
+        Log.d(TAG, "shareVideo2Wechat imgUrl = " + imgUrl
+                +" videoUrl = "+videoUrl
+                +" title = "+title
+                +" description = "+description
+                +" videoLowBandUrl = "+videoLowBandUrl
+                +" scene = "+scene
+        );
+
+        if (iwxapi == null) {
+            Log.e(TAG, "Error: iwxapi is null");
+            return;
+        }
     }
 
     private void requestWechatPay(MethodCall call, Result result) {
+        final String partnerId = call.argument("partnerId");
+        final String prepayId = call.argument("prepayId");
+        final String nonceStr = call.argument("nonceStr");
+        final String timeStamp = call.argument("timeStamp");
+        final String sign = call.argument("sign");
+        final String packages = call.argument("packages");
+        final String appid = call.argument("appid");
 
+        Log.d(TAG, "requestWechatPay partnerId = " + partnerId
+                +" prepayId = "+prepayId
+                +" nonceStr = "+nonceStr
+                +" timeStamp = "+timeStamp
+                +" sign = "+sign
+                +" packages = "+packages
+                +" appid = "+appid
+        );
+
+        if (iwxapi == null) {
+            Log.e(TAG, "Error: iwxapi is null");
+            return;
+        }
     }
 
     private static BroadcastReceiver createReceiver() {
