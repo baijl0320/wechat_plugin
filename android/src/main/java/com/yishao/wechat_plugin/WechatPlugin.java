@@ -12,6 +12,7 @@ import com.tencent.mm.opensdk.modelmsg.SendAuth;
 import com.tencent.mm.opensdk.modelmsg.SendMessageToWX;
 import com.tencent.mm.opensdk.modelmsg.WXImageObject;
 import com.tencent.mm.opensdk.modelmsg.WXMediaMessage;
+import com.tencent.mm.opensdk.modelmsg.WXWebpageObject;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.yishao.wechat_plugin.util.BitmapUtil;
@@ -174,6 +175,8 @@ public class WechatPlugin implements MethodCallHandler {
             Log.e(TAG, "Error: iwxapi is null");
             return;
         }
+
+        // TODO 待补充完整
     }
 
     private void shareText2Wechat(MethodCall call, Result result) {
@@ -188,6 +191,8 @@ public class WechatPlugin implements MethodCallHandler {
             Log.e(TAG, "Error: iwxapi is null");
             return;
         }
+
+        // TODO 待补充完整
     }
 
     private void shareWebpage2Wechat(MethodCall call, Result result) {
@@ -208,6 +213,21 @@ public class WechatPlugin implements MethodCallHandler {
             Log.e(TAG, "Error: iwxapi is null");
             return;
         }
+
+        WXWebpageObject webpageObject = new WXWebpageObject();
+        webpageObject.webpageUrl = webpageUrl;
+
+        WXMediaMessage wxMsg = new WXMediaMessage();
+        wxMsg.mediaObject = webpageObject;
+        wxMsg.title = title;
+        wxMsg.description = description;
+        wxMsg.thumbData = BitmapUtil.compressBitmap(BitmapUtil.getLocalOrNetBitmap(imageUrl), WX_THUMBNAIL_SIZE_LIMIT);
+
+        SendMessageToWX.Req req = new SendMessageToWX.Req();
+        req.transaction = String.valueOf(System.currentTimeMillis());
+        req.message = wxMsg;
+        req.scene = scene;
+        iwxapi.sendReq(req);
     }
 
     private void shareImage2Wechat(MethodCall call, Result result) {
@@ -224,12 +244,11 @@ public class WechatPlugin implements MethodCallHandler {
         }
 
         WXMediaMessage wxMsg = new WXMediaMessage();
-        Bitmap bitmap = BitmapUtil.gtLocalOrNetBitmap(imagePath);
+        Bitmap bitmap = BitmapUtil.getLocalOrNetBitmap(imagePath);
         if (bitmap != null) {
             WXImageObject wxImageObject = new WXImageObject(bitmap);
             wxMsg.mediaObject = wxImageObject;
-            // TODO 如果图片的thumbnail尺寸过大，需要添加压缩操作。
-            wxMsg.thumbData = BitmapUtil.bitmap2ByteArray(bitmap, false);
+            wxMsg.thumbData = BitmapUtil.compressBitmap(bitmap, WX_THUMBNAIL_SIZE_LIMIT);
 
             SendMessageToWX.Req req = new SendMessageToWX.Req();
             req.transaction = String.valueOf(System.currentTimeMillis());
